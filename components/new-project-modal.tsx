@@ -18,10 +18,48 @@ import {
   Loader2,
   Rocket,
   Plus,
-  Trash2
+  Trash2,
+  Sparkles,
+  Users,
+  Blocks,
+  Crown,
+  Building2,
+  Wrench
 } from "lucide-react"
 import { useState, useCallback } from "react"
 import { cn } from "@/lib/utils"
+
+// Workforce templates for spawning custom AI teams
+const workforceTemplates = [
+  {
+    id: "full-stack",
+    name: "Full Stack Development",
+    description: "Complete team for web app development",
+    agents: ["Project Lead", "Frontend Dev", "Backend Dev", "DevOps"],
+    browserEnabled: true
+  },
+  {
+    id: "marketing",
+    name: "Digital Marketing",
+    description: "Marketing campaigns and growth",
+    agents: ["Marketing Lead", "Content Creator", "Ads Specialist"],
+    browserEnabled: true
+  },
+  {
+    id: "automation",
+    name: "Browser Automation",
+    description: "Heavy Playwright automation focus",
+    agents: ["Automation Lead", "Scraper", "Form Filler", "Monitor"],
+    browserEnabled: true
+  },
+  {
+    id: "custom",
+    name: "Custom Configuration",
+    description: "Build your own workforce from scratch",
+    agents: [],
+    browserEnabled: true
+  }
+]
 
 export function NewProjectModal() {
   const { 
@@ -36,6 +74,7 @@ export function NewProjectModal() {
   const [step, setStep] = useState(1)
   const [isCreating, setIsCreating] = useState(false)
   const [autoLaunch, setAutoLaunch] = useState(true)
+  const [selectedTemplate, setSelectedTemplate] = useState("full-stack")
   
   const [formData, setFormData] = useState({
     name: "",
@@ -160,11 +199,6 @@ export function NewProjectModal() {
       tasks: []
     })
     
-    // Assign selected workers to the project
-    workers.forEach(worker => {
-      // In a real app, this would update the worker's assignment
-    })
-    
     if (autoLaunch) {
       await new Promise(resolve => setTimeout(resolve, 500))
       launchProject(newProject.id)
@@ -187,6 +221,8 @@ export function NewProjectModal() {
 
   if (!showNewProjectModal || !activeEmpire) return null
 
+  const selectedWorkforce = workforceTemplates.find(t => t.id === selectedTemplate)
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
@@ -196,7 +232,7 @@ export function NewProjectModal() {
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl bg-card border border-border/50 shadow-2xl">
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-card border border-border/50 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
           <div className="flex items-center gap-3">
@@ -204,8 +240,8 @@ export function NewProjectModal() {
               <FolderKanban className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-foreground">New Project</h2>
-              <p className="text-sm text-muted-foreground">in {activeEmpire.name} - Step {step} of 4</p>
+              <h2 className="text-lg font-semibold text-foreground">Launch New Project</h2>
+              <p className="text-sm text-muted-foreground">in {activeEmpire.name} - Step {step} of 5</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setShowNewProjectModal(false)}>
@@ -215,7 +251,7 @@ export function NewProjectModal() {
 
         {/* Progress */}
         <div className="flex gap-2 px-6 py-3 bg-muted/30">
-          {[1, 2, 3, 4].map((s) => (
+          {[1, 2, 3, 4, 5].map((s) => (
             <div 
               key={s}
               className={cn(
@@ -228,6 +264,7 @@ export function NewProjectModal() {
 
         {/* Content */}
         <div className="overflow-y-auto max-h-[calc(90vh-200px)] px-6 py-4">
+          {/* Step 1: Project Details */}
           {step === 1 && (
             <div className="space-y-4">
               <div>
@@ -298,15 +335,98 @@ export function NewProjectModal() {
             </div>
           )}
 
+          {/* Step 2: Spawn Custom Workforce */}
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-foreground mb-1">Assign AI Workforce</h3>
-                <p className="text-sm text-muted-foreground">Select project manager and workers</p>
+                <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Spawn Custom AI Workforce
+                </h3>
+                <p className="text-sm text-muted-foreground">Each project gets its own dedicated, containerized AI team</p>
+              </div>
+
+              {/* Key info banner */}
+              <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/20 text-primary">
+                    <Users className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">Isolated Containerized Workforce</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      This project will spawn its <span className="text-primary font-medium">own custom AI workforce</span> - 
+                      completely isolated and dedicated to this project alone. Your agents will have full 
+                      Playwright/browser automation to complete real-world tasks autonomously.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Workforce templates */}
+              <div>
+                <Label className="mb-2 block">Select Workforce Template</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {workforceTemplates.map((template) => (
+                    <button
+                      key={template.id}
+                      onClick={() => setSelectedTemplate(template.id)}
+                      className={cn(
+                        "flex flex-col items-start rounded-xl border p-4 text-left transition-all",
+                        selectedTemplate === template.id 
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/20" 
+                          : "border-border/50 hover:border-primary/30"
+                      )}
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <Blocks className="h-5 w-5 text-primary" />
+                        <span className="font-medium text-foreground">{template.name}</span>
+                        {selectedTemplate === template.id && (
+                          <Check className="h-4 w-4 text-primary ml-auto" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{template.description}</p>
+                      {template.agents.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {template.agents.map((agent) => (
+                            <span key={agent} className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                              {agent}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Browser automation note */}
+              <div className="rounded-lg border border-info/30 bg-info/5 p-3">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-info" />
+                  <p className="text-sm text-info">
+                    All workforce agents have Playwright browser automation - they can navigate websites, fill forms, click buttons, 
+                    extract data, and complete any web-based task autonomously.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Customize Workforce */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-foreground mb-1">Customize Your Workforce</h3>
+                <p className="text-sm text-muted-foreground">
+                  {selectedTemplate === "custom" 
+                    ? "Build your workforce from available agents" 
+                    : `Based on ${selectedWorkforce?.name} template - customize as needed`}
+                </p>
               </div>
 
               <div>
-                <Label>Project Manager</Label>
+                <Label>Project Manager (1 required)</Label>
                 <div className="mt-1.5 grid grid-cols-2 gap-2">
                   {projectManagers.map((agent) => (
                     <button
@@ -323,7 +443,10 @@ export function NewProjectModal() {
                         {agent.name[0]}
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-foreground">{agent.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-foreground">{agent.name}</p>
+                          <Crown className="h-3.5 w-3.5 text-info" />
+                        </div>
                         <p className="text-xs text-muted-foreground">{agent.performance}% performance</p>
                       </div>
                       {formData.manager === agent.id && (
@@ -336,7 +459,8 @@ export function NewProjectModal() {
 
               <div>
                 <Label>Worker Agents ({formData.workers.length} selected)</Label>
-                <div className="mt-1.5 grid grid-cols-2 gap-2">
+                <p className="text-xs text-muted-foreground mb-2">These agents will be cloned into your project&apos;s isolated container</p>
+                <div className="grid grid-cols-2 gap-2">
                   {workerAgents.map((agent) => (
                     <button
                       key={agent.id}
@@ -352,7 +476,10 @@ export function NewProjectModal() {
                         {agent.name[0]}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground text-sm">{agent.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-foreground text-sm">{agent.name}</p>
+                          <Wrench className="h-3 w-3 text-warning" />
+                        </div>
                         <div className="flex flex-wrap gap-1 mt-0.5">
                           {agent.capabilities.slice(0, 2).map(cap => (
                             <span key={cap} className="text-[10px] text-muted-foreground">{cap}</span>
@@ -366,14 +493,36 @@ export function NewProjectModal() {
                   ))}
                 </div>
               </div>
+
+              {/* Workforce hierarchy preview */}
+              <div className="rounded-lg border border-border/50 bg-muted/30 p-4">
+                <p className="text-xs font-medium text-muted-foreground mb-3">Your Project Workforce Hierarchy:</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
+                    <Building2 className="h-3 w-3" />
+                    {activeEmpire.manager?.name || "Empire Manager"}
+                  </div>
+                  <span className="text-muted-foreground">→</span>
+                  <div className="flex items-center gap-1.5 rounded-full bg-info/10 px-2.5 py-1 text-xs text-info">
+                    <FolderKanban className="h-3 w-3" />
+                    {projectManagers.find(a => a.id === formData.manager)?.name || "Project Manager"}
+                  </div>
+                  <span className="text-muted-foreground">→</span>
+                  <div className="flex items-center gap-1.5 rounded-full bg-warning/10 px-2.5 py-1 text-xs text-warning">
+                    <Bot className="h-3 w-3" />
+                    {formData.workers.length} Worker Agents
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
-          {step === 3 && (
+          {/* Step 4: APIs & Credentials */}
+          {step === 4 && (
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold text-foreground mb-1">APIs & Credentials</h3>
-                <p className="text-sm text-muted-foreground">Configure integrations and access</p>
+                <p className="text-sm text-muted-foreground">Configure integrations and access for your AI workforce</p>
               </div>
 
               {/* APIs */}
@@ -464,7 +613,7 @@ export function NewProjectModal() {
                   <Globe className="h-5 w-5 text-info" />
                   <div>
                     <p className="font-medium text-foreground">Playwright Browser Automation</p>
-                    <p className="text-xs text-muted-foreground">Agents can browse, interact, and automate web tasks</p>
+                    <p className="text-xs text-muted-foreground">Your workforce can browse, interact, and automate web tasks</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -499,7 +648,8 @@ export function NewProjectModal() {
             </div>
           )}
 
-          {step === 4 && (
+          {/* Step 5: Review & Launch */}
+          {step === 5 && (
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Review & Launch</h3>
@@ -519,6 +669,10 @@ export function NewProjectModal() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-lg bg-background/50 p-3">
+                    <p className="text-xs text-muted-foreground">Workforce Template</p>
+                    <p className="font-medium text-foreground">{selectedWorkforce?.name}</p>
+                  </div>
+                  <div className="rounded-lg bg-background/50 p-3">
                     <p className="text-xs text-muted-foreground">Project Manager</p>
                     <p className="font-medium text-foreground">
                       {projectManagers.find(a => a.id === formData.manager)?.name || "Not assigned"}
@@ -536,14 +690,28 @@ export function NewProjectModal() {
                     <p className="text-xs text-muted-foreground">APIs & Credentials</p>
                     <p className="font-medium text-foreground">{formData.apis.length + formData.credentials.length} configured</p>
                   </div>
-                </div>
-
-                {formData.browserConfig.enabled && (
-                  <div className="flex items-center gap-2 text-sm text-info">
-                    <Globe className="h-4 w-4" />
-                    Browser automation enabled (max {formData.browserConfig.maxSessions} sessions)
+                  <div className="rounded-lg bg-background/50 p-3">
+                    <p className="text-xs text-muted-foreground">Browser Sessions</p>
+                    <p className="font-medium text-foreground">
+                      {formData.browserConfig.enabled ? `Max ${formData.browserConfig.maxSessions}` : "Disabled"}
+                    </p>
                   </div>
-                )}
+                </div>
+              </div>
+
+              {/* Key message about isolated workforce */}
+              <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5 p-4">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-foreground">Spawning Containerized AI Workforce</h4>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Upon launch, this project will spawn its own dedicated AI workforce in an isolated container. 
+                      Your agents will immediately begin working autonomously, using browser automation to complete 
+                      real-world tasks and build your project from the ground up.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="rounded-lg border border-border/50 p-4">
@@ -557,7 +725,7 @@ export function NewProjectModal() {
                   <div>
                     <p className="font-medium text-foreground">Auto-launch after creation</p>
                     <p className="text-xs text-muted-foreground">
-                      Immediately deploy the AI workforce to start building autonomously
+                      Immediately deploy the containerized AI workforce to start building
                     </p>
                   </div>
                 </label>
@@ -565,7 +733,8 @@ export function NewProjectModal() {
 
               <div className="rounded-lg border border-success/30 bg-success/5 p-3">
                 <p className="text-sm text-success">
-                  Your AI workforce will immediately begin working on this project, using browser automation to complete real-world tasks autonomously.
+                  Your custom AI workforce will be fully operational within seconds, autonomously building, deploying, 
+                  and scaling your project using Playwright browser automation for 100% real-world effectiveness.
                 </p>
               </div>
             </div>
@@ -581,7 +750,7 @@ export function NewProjectModal() {
             {step === 1 ? "Cancel" : "Back"}
           </Button>
           
-          {step < 4 ? (
+          {step < 5 ? (
             <Button 
               onClick={() => setStep(step + 1)}
               disabled={step === 1 && !formData.name}
@@ -598,12 +767,12 @@ export function NewProjectModal() {
               {isCreating ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {autoLaunch ? "Launching Project..." : "Creating Project..."}
+                  {autoLaunch ? "Spawning Workforce..." : "Creating Project..."}
                 </>
               ) : (
                 <>
                   <Rocket className="h-4 w-4" />
-                  {autoLaunch ? "Create & Launch" : "Create Project"}
+                  {autoLaunch ? "Launch & Spawn Workforce" : "Create Project"}
                 </>
               )}
             </Button>
