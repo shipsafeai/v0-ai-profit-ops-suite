@@ -16,6 +16,7 @@ export function Header() {
   const { 
     sidebarOpen, 
     activeView, 
+    setActiveView,
     setShowNewEmpireModal, 
     setShowNewProjectModal,
     activeEmpire 
@@ -28,6 +29,7 @@ export function Header() {
       case "projects": return "Project Operations"
       case "agents": return "AI Workforce"
       case "browser": return "Browser Automation"
+      case "console": return "AI Console"
       case "settings": return "Settings"
       default: return "AI Profit Ops"
     }
@@ -40,6 +42,7 @@ export function Header() {
       case "projects": return "Track and launch autonomous projects"
       case "agents": return "Monitor your AI agent hierarchy"
       case "browser": return "Real-time Playwright browser sessions"
+      case "console": return "Talk to your AI workforce and take real action"
       case "settings": return "Configure system preferences"
       default: return ""
     }
@@ -99,7 +102,13 @@ export function Header() {
         </div>
 
         {/* Chat with Kassandra */}
-        <Button variant="outline" size="icon" className="relative border-primary/20 hover:bg-primary/5 hover:border-primary/40">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setActiveView("console")}
+          aria-label="Open AI Console"
+          className="relative border-primary/20 hover:bg-primary/5 hover:border-primary/40"
+        >
           <MessageSquare className="h-4 w-4 text-primary" />
           <span className="absolute -right-1 -top-1 flex h-2.5 w-2.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />

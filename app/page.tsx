@@ -8,6 +8,7 @@ import { EmpiresView } from "@/components/empires-view"
 import { ProjectsView } from "@/components/projects-view"
 import { AgentsView } from "@/components/agents-view"
 import { BrowserView } from "@/components/browser-view"
+import { CommandConsole } from "@/components/command-console"
 import { SettingsView } from "@/components/settings-view"
 import { NewEmpireModal } from "@/components/new-empire-modal"
 import { NewProjectModal } from "@/components/new-project-modal"
@@ -24,6 +25,7 @@ function CommandCentre() {
       case "projects": return <ProjectsView />
       case "agents": return <AgentsView />
       case "browser": return <BrowserView />
+      case "console": return <CommandConsole />
       case "settings": return <SettingsView />
       default: return <DashboardView />
     }
