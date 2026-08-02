@@ -41,6 +41,21 @@ const TOOL_META: Record<string, { label: string; icon: typeof Bot }> = {
   updateAgentStatus: { label: "Update Agent Status", icon: UserCog },
 }
 
+// Map raw/forwarded gateway errors to a clear, actionable operator message.
+function humanizeError(raw?: string): string {
+  const lower = (raw ?? "").toLowerCase()
+  if (lower.includes("credit card") || lower.includes("customer_verification_required")) {
+    return "AI Gateway needs a valid payment method on your Vercel team before it will serve model requests. Open your Vercel dashboard, go to AI \u2192 billing, add a card to unlock your free credits, then try again."
+  }
+  if (lower.includes("api key") || lower.includes("unauthorized") || lower.includes("401") || lower.includes("403")) {
+    return "The AI Gateway rejected the request due to missing or invalid credentials. Confirm the AI Gateway integration is connected (or set AI_GATEWAY_API_KEY) and try again."
+  }
+  if (lower.includes("rate limit") || lower.includes("429")) {
+    return "The model provider is rate limiting requests right now. Wait a moment and try again."
+  }
+  return "Something went wrong reaching the agent. Please try again."
+}
+
 function buildSnapshot(empires: Empire[], agents: Agent[], sessions: ReturnType<typeof useStore>["browserSessions"]): OpsSnapshot {
   const agentName = (id: string) => agents.find((a) => a.id === id)?.name ?? id
   return {
@@ -372,7 +387,7 @@ export function CommandConsole() {
 
           {error && (
             <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
-              Something went wrong reaching the agent. Please try again.
+              {humanizeError(error.message)}
             </div>
           )}
         </div>

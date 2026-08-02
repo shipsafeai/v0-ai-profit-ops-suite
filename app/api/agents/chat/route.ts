@@ -97,5 +97,31 @@ export async function POST(req: Request) {
 
   return createUIMessageStreamResponse({
     stream: toUIMessageStream({ stream: result.stream }),
+    onError: (error) => humanizeGatewayError(error),
   })
+}
+
+// Turn raw AI Gateway / provider errors into a short, actionable message that the
+// console surfaces to the operator instead of a generic failure string.
+function humanizeGatewayError(error: unknown): string {
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : JSON.stringify(error)
+
+  const lower = message.toLowerCase()
+
+  if (lower.includes("credit card") || lower.includes("customer_verification_required")) {
+    return "AI Gateway needs a valid payment method on your Vercel team before it will serve model requests. Add a card in your Vercel dashboard under AI \u2192 billing to unlock your free credits, then try again."
+  }
+  if (lower.includes("api key") || lower.includes("unauthorized") || lower.includes("401") || lower.includes("403")) {
+    return "The AI Gateway rejected the request due to missing or invalid credentials. Confirm the AI Gateway integration is connected (or set AI_GATEWAY_API_KEY) and try again."
+  }
+  if (lower.includes("rate limit") || lower.includes("429")) {
+    return "The model provider is rate limiting requests right now. Wait a moment and try again."
+  }
+
+  return "Something went wrong reaching the agent. Please try again."
 }
