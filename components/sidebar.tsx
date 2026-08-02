@@ -7,6 +7,7 @@ import {
   FolderKanban, 
   Bot, 
   Globe,
+  MessageSquare,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -20,6 +21,7 @@ const navItems = [
   { id: "empires", label: "Empires", icon: Building2 },
   { id: "projects", label: "Projects", icon: FolderKanban },
   { id: "agents", label: "AI Workforce", icon: Bot },
+  { id: "console", label: "AI Console", icon: MessageSquare },
   { id: "browser", label: "Browser Sessions", icon: Globe },
   { id: "settings", label: "Settings", icon: Settings },
 ] as const

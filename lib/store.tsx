@@ -126,12 +126,16 @@ interface StoreContextType {
   // Browser Sessions
   browserSessions: BrowserSession[]
   createBrowserSession: (agentId: string, projectId: string, url: string, action: string) => BrowserSession
+
+  // Agent-driven mutations (used by the AI Command Console tools)
+  addTasksToProject: (projectId: string, tasks: Task[]) => void
+  setAgentStatus: (agentId: string, status: Agent["status"], currentTask?: string) => void
   
   // UI State
   sidebarOpen: boolean
   setSidebarOpen: (open: boolean) => void
-  activeView: "dashboard" | "empires" | "projects" | "agents" | "browser" | "settings"
-  setActiveView: (view: "dashboard" | "empires" | "projects" | "agents" | "browser" | "settings") => void
+  activeView: "dashboard" | "empires" | "projects" | "agents" | "browser" | "console" | "settings"
+  setActiveView: (view: "dashboard" | "empires" | "projects" | "agents" | "browser" | "console" | "settings") => void
   
   // Modals
   showNewEmpireModal: boolean
@@ -302,14 +306,14 @@ const initialBrowserSessions: BrowserSession[] = [
 ]
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [ceoAgent] = useState<Agent>(initialCeoAgent)
+  const [ceoAgent, setCeoAgent] = useState<Agent>(initialCeoAgent)
   const [empires, setEmpires] = useState<Empire[]>(initialEmpires)
   const [activeEmpire, setActiveEmpire] = useState<Empire | null>(initialEmpires[0])
   const [activeProject, setActiveProject] = useState<Project | null>(null)
   const [availableAgents, setAvailableAgents] = useState<Agent[]>(initialAgents)
   const [browserSessions, setBrowserSessions] = useState<BrowserSession[]>(initialBrowserSessions)
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [activeView, setActiveView] = useState<"dashboard" | "empires" | "projects" | "agents" | "browser" | "settings">("dashboard")
+  const [activeView, setActiveView] = useState<"dashboard" | "empires" | "projects" | "agents" | "browser" | "console" | "settings">("dashboard")
   const [showNewEmpireModal, setShowNewEmpireModal] = useState(false)
   const [showNewProjectModal, setShowNewProjectModal] = useState(false)
   const [showAgentDetailModal, setShowAgentDetailModal] = useState(false)
@@ -384,6 +388,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return newSession
   }, [])
 
+  const addTasksToProject = useCallback((projectId: string, tasks: Task[]) => {
+    setEmpires(prev => prev.map(e => ({
+      ...e,
+      projects: e.projects.map(p =>
+        p.id === projectId
+          ? { ...p, tasks: [...p.tasks, ...tasks] }
+          : p
+      )
+    })))
+  }, [])
+
+  const setAgentStatus = useCallback((agentId: string, status: Agent["status"], currentTask?: string) => {
+    setCeoAgent(prev => prev.id === agentId ? { ...prev, status, ...(currentTask !== undefined ? { currentTask } : {}) } : prev)
+    setAvailableAgents(prev => prev.map(a =>
+      a.id === agentId ? { ...a, status, ...(currentTask !== undefined ? { currentTask } : {}) } : a
+    ))
+  }, [])
+
   return (
     <StoreContext.Provider value={{
       ceoAgent,
@@ -400,6 +422,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       assignAgent,
       browserSessions,
       createBrowserSession,
+      addTasksToProject,
+      setAgentStatus,
       sidebarOpen,
       setSidebarOpen,
       activeView,

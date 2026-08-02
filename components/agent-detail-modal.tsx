@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { Progress } from "@/components/ui/progress"
 
 export function AgentDetailModal() {
-  const { showAgentDetailModal, setShowAgentDetailModal, selectedAgent, browserSessions } = useStore()
+  const { showAgentDetailModal, setShowAgentDetailModal, selectedAgent, browserSessions, setActiveView } = useStore()
 
   if (!showAgentDetailModal || !selectedAgent) return null
 
@@ -192,7 +192,14 @@ export function AgentDetailModal() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" className="gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => {
+                setShowAgentDetailModal(false)
+                setActiveView("console")
+              }}
+            >
               <MessageSquare className="h-4 w-4" />
               Send Message
             </Button>
